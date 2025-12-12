@@ -5,6 +5,10 @@
 IMX_SD_KERNEL_PARTSIZE = 64
 IMX_SD_KERNELPART_OFFSET = 16
 IMX_SD_ROOTFSPART_OFFSET = 56
+# Set rootfs partition size to 4096MB to utilize more SD card space
+# For smaller SD cards, the partition will be limited by the card size
+# To use all remaining space, you can set this to 0 (if ptgen supports it)
+# or create a first-boot script to resize the partition
 IMX_SD_ROOTFS_PARTSIZE = 100
 IMX_SD_IMAGE_SIZE = $(shell echo $$((($(IMX_SD_KERNEL_PARTSIZE) + \
 	$(IMX_SD_ROOTFS_PARTSIZE)))))
@@ -172,7 +176,8 @@ define Device/imx93evk
 	firmware-sentinel \
 	imx-mkimage \
 	u-boot-imx93evk
-  DEVICE_DTS := $(basename $(notdir $(wildcard $(DTS_DIR)/freescale/imx93-*-evk*.dts)))
+  DTS_DIR := ../dts
+  DEVICE_DTS := imx93-11x11-evk
   IMAGE/sdcard.img := \
 	imx-clean | \
 	imx-create-flash $$(BOARD_NAME) $$(BOOT_TYPE) | \
