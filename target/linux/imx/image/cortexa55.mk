@@ -51,6 +51,13 @@ define Build/imx-create-flash
 	cd $(STAGING_DIR_IMAGE)/imx-mkimage && $(MAKE) SOC=$(1) $(2)
 endef
 
+define Build/imx-create-boot
+	# Create the boot.bin
+	$(info [imx-create-boot] SOC=$(1) TARGET=$(BOOT_TYPE))
+	cd $(STAGING_DIR_IMAGE)/imx-mkimage && $(MAKE) SOC=$(1) $(BOOT_TYPE)
+	cp $(STAGING_DIR_IMAGE)/imx-mkimage/$(1)/flash.bin $@
+endef
+
 define Build/imx-append-env
 	# append env binary
 	dd if=$(STAGING_DIR_IMAGE)/$(1) of="$@" bs=1M seek=7 conv=notrunc
@@ -178,12 +185,14 @@ define Device/imx93evk
 	u-boot-imx93evk
   DTS_DIR := ../dts
   DEVICE_DTS := imx93-11x11-evk
+  IMAGES += boot.bin
+  IMAGE/boot.bin := \
+	imx-clean | \
+	imx-create-boot $$(BOARD_NAME)
   IMAGE/sdcard.img := \
 	imx-clean | \
-	imx-create-flash $$(BOARD_NAME) $$(BOOT_TYPE) | \
 	boot-img-ext4 | \
 	sdcard-img-ext4 | \
-	imx-append-boot $$(SOC_TYPE) | \
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
 TARGET_DEVICES += imx93evk
@@ -204,12 +213,16 @@ define Device/imx93frdm
 	imx-mkimage \
 	u-boot-imx93frdm
   DEVICE_DTS := $(basename $(notdir $(wildcard $(DTS_DIR)/freescale/imx93-11x11-frdm*.dts)))
-  IMAGE/sdcard.img := \
+  IMAGES += flash.bin
+  IMAGE/flash.bin := \
 	imx-clean | \
 	imx-create-flash $$(BOARD_NAME) $$(BOOT_TYPE) | \
 	boot-img-ext4 | \
+	imx-append-env $$(ENV_NAME)-uboot-env.bin
+  IMAGE/sdcard.img := \
+	imx-clean | \
+	boot-img-ext4 | \
 	sdcard-img-ext4 | \
-	imx-append-boot $$(SOC_TYPE) | \
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
 TARGET_DEVICES += imx93frdm
