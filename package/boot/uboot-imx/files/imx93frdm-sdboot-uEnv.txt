@@ -10,4 +10,4 @@ load_fdt=ext4load mmc 1:1 $fdt_addr $fdt_img
 sd_boot=run load_img && run load_fdt && booti $loadaddr - $fdt_addr
 bootargs=root=/dev/mmcblk1p2 rw rootwait rootfstype=squashfs,f2fs noinitrd console=ttyLP0,115200 earlycon
 bootcmd=echo starting openwrt ...;run sd_boot
-bootdelay=3
+bootdelay=10
