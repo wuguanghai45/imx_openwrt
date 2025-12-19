@@ -6,7 +6,7 @@
 /dts-v1/;
 
 #include <dt-bindings/usb/pd.h>
-#include "imx93.dtsi"
+#include "imx9352.dtsi"
 
 &ele_mu {
 	memory-region = <&ele_reserved>;

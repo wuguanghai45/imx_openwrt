@@ -4,7 +4,7 @@ fdt_high=0x8fffffff
 initrd_addr=0x83800000
 initrd_high=0xffffffffffffffff
 kernel_img=Image
-fdt_img=imx93-11x11-evk.dtb
+fdt_img=imx9352.dtb
 load_img=ext4load mmc 0:1 $loadaddr $kernel_img
 load_fdt=ext4load mmc 0:1 $fdt_addr $fdt_img
 # Boot from on-board eMMC (mmc0) instead of external SD (mmc1)

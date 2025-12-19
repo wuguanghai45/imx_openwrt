@@ -252,3 +252,33 @@ define Device/imx93qsb
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
 TARGET_DEVICES += imx93qsb
+
+
+define Device/imx9352
+  $(call Device/Default)
+  DEVICE_VENDOR := NXP
+  DEVICE_MODEL := imx9352
+  DEVICE_VARIANT := SD Boot
+  BOARD_NAME := iMX93
+  SOC_TYPE := iMX93
+  BOOT_TYPE := flash_singleboot
+  ENV_NAME:=imx9352-sdboot
+  DEVICE_PACKAGES += \
+	atf-imx9352 \
+	firmware-imx \
+	firmware-sentinel \
+	imx-mkimage \
+	u-boot-imx9352
+  DTS_DIR := ../dts
+  DEVICE_DTS := imx9352
+  IMAGES += boot.bin
+  IMAGE/boot.bin := \
+	imx-clean | \
+	imx-create-boot $$(BOARD_NAME)
+  IMAGE/sdcard.img := \
+	imx-clean | \
+	boot-img-ext4 | \
+	sdcard-img-ext4 | \
+	imx-append-env $$(ENV_NAME)-uboot-env.bin
+endef
+TARGET_DEVICES += imx9352

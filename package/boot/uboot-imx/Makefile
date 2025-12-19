@@ -177,6 +177,18 @@ define U-Boot/imx93qsb
   DEPENDS:=@TARGET_imx_cortexa55 +imx-mkimage
 endef
 
+
+define U-Boot/imx9352
+  BUILD_DEVICES:=imx93
+  NAME:=imx9352 board
+  UBOOT_CONFIG:=imx9352
+  ENV_NAME:=imx9352-sdboot
+  DTB_NAME:=imx9352.dtb
+  ENV_SIZE:=0x4000
+  IMG_DIR:=iMX93
+  DEPENDS:=@TARGET_imx_cortexa55 +imx-mkimage
+endef
+
 UBOOT_TARGETS := \
 	apalis_imx6 \
 	mx6cuboxi \
@@ -192,7 +204,8 @@ UBOOT_TARGETS := \
 	imx91qsb \
 	imx93evk \
 	imx93frdm \
-	imx93qsb
+	imx93qsb \
+  imx9352 
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR_IMAGE)

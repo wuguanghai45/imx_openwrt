@@ -1,0 +1,909 @@
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 737e959a6b5..7e16ba7f055 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -1191,6 +1191,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
+ 	imx91-9x9-qsb.dtb \
+ 	imx91-11x11-evk-spinand.dtb \
+ 	imx91-11x11-evk-tianma-wvga-panel.dtb \
++	imx9352.dtb \
+ 	imx93-11x11-evk.dtb \
+ 	imx93-11x11-evk-pmic-pf0900.dtb \
+ 	imx93-14x14-evk.dtb \
+diff --git a/arch/arm/dts/imx9352-u-boot.dtsi b/arch/arm/dts/imx9352-u-boot.dtsi
+new file mode 100644
+index 00000000000..7243361f217
+--- /dev/null
++++ b/arch/arm/dts/imx9352-u-boot.dtsi
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright 2022 NXP
++ */
++
++#include "imx93-u-boot.dtsi"
++
++/ {
++	wdt-reboot {
++		compatible = "wdt-reboot";
++		wdt = <&wdog3>;
++		bootph-pre-ram;
++		bootph-some-ram;
++	};
++
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};
++};
++
++&A55_0 {
++	clocks = <&clk IMX93_CLK_A55_SEL>;
++};
++
++&A55_1 {
++	clocks = <&clk IMX93_CLK_A55_SEL>;
++};
++
++&{/soc@0} {
++	bootph-all;
++	bootph-pre-ram;
++};
++
++&aips1 {
++	bootph-pre-ram;
++	bootph-all;
++};
++
++&aips2 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&aips3 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&iomuxc {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&reg_usdhc2_vmmc {
++	u-boot,off-on-delay-us = <20000>;
++	bootph-pre-ram;
++};
++
++&pinctrl_reg_usdhc2_vmmc {
++	bootph-pre-ram;
++};
++
++&pinctrl_uart1 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&pinctrl_usdhc1 {
++	bootph-pre-ram;
++};
++
++&pinctrl_usdhc2_gpio {
++	bootph-pre-ram;
++};
++
++&pinctrl_usdhc2 {
++	bootph-pre-ram;
++};
++
++&gpio1 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&gpio2 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&gpio3 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&gpio4 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&lpuart1 {
++	bootph-pre-ram;
++	bootph-some-ram;
++};
++
++&usdhc1 {
++	bootph-pre-ram;
++};
++
++&usdhc2 {
++	bootph-pre-ram;
++	fsl,signal-voltage-switch-extra-delay-ms = <8>;
++};
++
++&lpi2c1 {
++	bootph-pre-ram;
++};
++
++&lpi2c2 {
++	bootph-pre-ram;
++};
++
++&lpi2c3 {
++	bootph-pre-ram;
++};
++
++&pinctrl_lpi2c1 {
++	bootph-pre-ram;
++};
++
++&pinctrl_lpi2c2 {
++	bootph-pre-ram;
++};
++
++&pinctrl_lpi2c3 {
++	bootph-pre-ram;
++};
++
++&fec {
++	phy-reset-duration = <15>;
++	phy-reset-post-delay = <100>;
++};
++
++&ethphy1 {
++	reset-assert-us = <15000>;
++	reset-deassert-us = <100000>;
++};
++
++&s4muap {
++	bootph-pre-ram;
++	bootph-some-ram;
++	status = "okay";
++};
++
++&clk {
++	bootph-all;
++	bootph-pre-ram;
++	/delete-property/ assigned-clocks;
++	/delete-property/ assigned-clock-rates;
++	/delete-property/ assigned-clock-parents;
++};
++
++&osc_32k {
++	bootph-all;
++	bootph-pre-ram;
++};
++
++&osc_24m {
++	bootph-all;
++	bootph-pre-ram;
++};
++
++&clk_ext1 {
++	bootph-all;
++	bootph-pre-ram;
++};
++
++&lcdif {
++	assigned-clocks = <&clk IMX93_CLK_MEDIA_AXI>, <&clk IMX93_CLK_MEDIA_APB>;
++	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1>, <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
++	assigned-clock-rates = <400000000>, <133333334>;
++};
+diff --git a/arch/arm/dts/imx9352.dts b/arch/arm/dts/imx9352.dts
+new file mode 100644
+index 00000000000..884f1fbb82f
+--- /dev/null
++++ b/arch/arm/dts/imx9352.dts
+@@ -0,0 +1,502 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2022 NXP
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/usb/pd.h>
++#include "imx93.dtsi"
++
++/ {
++	model = "NXP i.MX9352 Wormhole board";
++	compatible = "fsl,imx9352", "fsl,imx93-11x11-evk", "fsl,imx93";
++
++	aliases {
++		rtc0 = &pcf8563;
++	};
++
++	chosen {
++		bootargs = "console=ttyLP0,115200";
++		stdout-path = &lpuart1;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			alloc-ranges = <0 0x80000000 0 0x25000000>;
++			size = <0 0x10000000>;
++			linux,cma-default;
++		};
++	};
++
++	reg_vref_1v8: regulator-adc-vref {
++		compatible = "regulator-fixed";
++		regulator-name = "vref_1v8";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++	};
++
++	reg_usdhc2_vmmc: regulator-usdhc2 {
++		compatible = "regulator-fixed";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
++		regulator-name = "VSD_3V3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
++		off-on-delay-us = <12000>;
++		enable-active-high;
++	};
++
++	dsi_host: dsi-host {
++		compatible = "synopsys,dw-mipi-dsi";
++		status = "disabled";
++	};
++};
++
++&adc1 {
++	vref-supply = <&reg_vref_1v8>;
++	status = "okay";
++};
++
++&dphy {
++	status = "disabled";
++};
++
++&dsi {
++	status = "disabled";
++};
++
++&mu1 {
++	status = "okay";
++};
++
++&mu2 {
++	status = "okay";
++};
++
++&eqos {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_eqos>;
++	phy-mode = "rgmii-id";
++	phy-handle = <&ethphy1>;
++	status = "okay";
++
++	mdio {
++		compatible = "snps,dwmac-mdio";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		clock-frequency = <5000000>;
++
++		ethphy1: ethernet-phy@1 {
++			reg = <1>;
++			eee-broken-1000t;
++		};
++	};
++};
++
++&fec {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_fec>;
++	phy-mode = "rgmii-id";
++	phy-handle = <&ethphy2>;
++	fsl,magic-packet;
++	status = "okay";
++
++	mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		clock-frequency = <5000000>;
++
++		ethphy2: ethernet-phy@2 {
++			reg = <2>;
++			eee-broken-1000t;
++		};
++	};
++};
++
++&lcdif {
++	status = "disabled";
++};
++
++&lpi2c1 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	clock-frequency = <400000>;
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&pinctrl_lpi2c1>;
++	pinctrl-1 = <&pinctrl_lpi2c1>;
++	status = "okay";
++};
++
++&lpi2c2 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	clock-frequency = <400000>;
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&pinctrl_lpi2c2>;
++	pinctrl-1 = <&pinctrl_lpi2c2>;
++	status = "okay";
++
++	pmic@25 {
++		compatible = "nxp,pca9451a";
++		reg = <0x25>;
++
++		regulators {
++			buck1: BUCK1 {
++				regulator-name = "BUCK1";
++				regulator-min-microvolt = <650000>;
++				regulator-max-microvolt = <2237500>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <3125>;
++			};
++
++			buck2: BUCK2 {
++				regulator-name = "BUCK2";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <2187500>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <3125>;
++			};
++
++			buck4: BUCK4{
++				regulator-name = "BUCK4";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <3400000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			buck5: BUCK5{
++				regulator-name = "BUCK5";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <3400000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			buck6: BUCK6 {
++				regulator-name = "BUCK6";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <3400000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo1: LDO1 {
++				regulator-name = "LDO1";
++				regulator-min-microvolt = <1600000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo2: LDO2 {
++				regulator-name = "LDO2";
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <1150000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo3: LDO3 {
++				regulator-name = "LDO3";
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo4: LDO4 {
++				regulator-name = "LDO4";
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo5: LDO5 {
++				regulator-name = "LDO5";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++		};
++	};
++};
++
++&lpi2c3 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	clock-frequency = <400000>;
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&pinctrl_lpi2c3>;
++	pinctrl-1 = <&pinctrl_lpi2c3>;
++	status = "okay";
++
++	pcf8563:rtc@51 {
++		compatible = "nxp,pcf8563";
++		reg = <0x51>;
++		status = "okay";
++	};
++};
++
++&lpuart1 { /* console */
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart1>;
++	status = "okay";
++};
++
++&media_blk_ctrl {
++	status = "okay";
++};
++
++&usdhc1 {
++	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++	pinctrl-0 = <&pinctrl_usdhc1>;
++	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
++	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
++	bus-width = <8>;
++	non-removable;
++	status = "okay";
++};
++
++&usdhc2 {
++	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
++	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
++	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
++	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
++	vmmc-supply = <&reg_usdhc2_vmmc>;
++	bus-width = <4>;
++	status = "okay";
++	no-sdio;
++	no-mmc;
++};
++
++&usdhc3 {
++	status = "disabled";
++};
++
++&flexspi1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_flexspi>;
++	assigned-clock-rates = <80000000>;
++	status = "okay";
++
++	flash0: flash@0 {
++		reg = <0>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <80000000>;
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++	};
++};
++
++&wdog3 {
++	status = "okay";
++};
++
++&iomuxc {
++	pinctrl_eqos: eqosgrp {
++		fsl,pins = <
++			MX93_PAD_ENET1_MDC__ENET_QOS_MDC			0x57e
++			MX93_PAD_ENET1_MDIO__ENET_QOS_MDIO			0x57e
++			MX93_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0			0x57e
++			MX93_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1			0x57e
++			MX93_PAD_ENET1_RD2__ENET_QOS_RGMII_RD2			0x57e
++			MX93_PAD_ENET1_RD3__ENET_QOS_RGMII_RD3			0x57e
++			MX93_PAD_ENET1_RXC__CCM_ENET_QOS_CLOCK_GENERATE_RX_CLK	0x5fe
++			MX93_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL		0x57e
++			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0			0x57e
++			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1			0x57e
++			MX93_PAD_ENET1_TD2__ENET_QOS_RGMII_TD2			0x57e
++			MX93_PAD_ENET1_TD3__ENET_QOS_RGMII_TD3			0x57e
++			MX93_PAD_ENET1_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x5fe
++			MX93_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL		0x57e
++		>;
++	};
++
++	pinctrl_flexspi: flexspigrp {
++		fsl,pins = <
++			MX93_PAD_SD3_CMD__FLEXSPI1_A_SS0_B      0x3fe
++			MX93_PAD_SD3_CLK__FLEXSPI1_A_SCLK       0x3fe
++			MX93_PAD_SD3_DATA0__FLEXSPI1_A_DATA00   0x3fe
++			MX93_PAD_SD3_DATA1__FLEXSPI1_A_DATA01   0x3fe
++			MX93_PAD_SD3_DATA2__FLEXSPI1_A_DATA02   0x3fe
++			MX93_PAD_SD3_DATA3__FLEXSPI1_A_DATA03   0x3fe
++		>;
++	};
++
++	pinctrl_fec: fecgrp {
++		fsl,pins = <
++			MX93_PAD_ENET2_MDC__ENET1_MDC			0x57e
++			MX93_PAD_ENET2_MDIO__ENET1_MDIO			0x57e
++			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0		0x57e
++			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1		0x57e
++			MX93_PAD_ENET2_RD2__ENET1_RGMII_RD2		0x57e
++			MX93_PAD_ENET2_RD3__ENET1_RGMII_RD3		0x57e
++			MX93_PAD_ENET2_RXC__ENET1_RGMII_RXC		0x5fe
++			MX93_PAD_ENET2_RX_CTL__ENET1_RGMII_RX_CTL	0x57e
++			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0		0x57e
++			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1		0x57e
++			MX93_PAD_ENET2_TD2__ENET1_RGMII_TD2		0x57e
++			MX93_PAD_ENET2_TD3__ENET1_RGMII_TD3		0x57e
++			MX93_PAD_ENET2_TXC__ENET1_RGMII_TXC		0x5fe
++			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
++		>;
++	};
++
++	pinctrl_lpi2c1: lpi2c1grp {
++		fsl,pins = <
++			MX93_PAD_I2C1_SCL__LPI2C1_SCL			0x40000b9e
++			MX93_PAD_I2C1_SDA__LPI2C1_SDA			0x40000b9e
++		>;
++	};
++
++	pinctrl_lpi2c2: lpi2c2grp {
++		fsl,pins = <
++			MX93_PAD_I2C2_SCL__LPI2C2_SCL			0x40000b9e
++			MX93_PAD_I2C2_SDA__LPI2C2_SDA			0x40000b9e
++		>;
++	};
++
++	pinctrl_lpi2c3: lpi2c3grp {
++		fsl,pins = <
++			MX93_PAD_GPIO_IO28__LPI2C3_SDA			0x40000b9e
++			MX93_PAD_GPIO_IO29__LPI2C3_SCL			0x40000b9e
++		>;
++	};
++
++	pinctrl_pcal6524: pcal6524grp {
++		fsl,pins = <
++			MX93_PAD_CCM_CLKO2__GPIO3_IO27			0x31e
++		>;
++	};
++
++	pinctrl_uart1: uart1grp {
++		fsl,pins = <
++			MX93_PAD_UART1_RXD__LPUART1_RX			0x31e
++			MX93_PAD_UART1_TXD__LPUART1_TX			0x31e
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc1: usdhc1grp {
++		fsl,pins = <
++			MX93_PAD_SD1_CLK__USDHC1_CLK		0x1582
++			MX93_PAD_SD1_CMD__USDHC1_CMD		0x40001382
++			MX93_PAD_SD1_DATA0__USDHC1_DATA0	0x40001382
++			MX93_PAD_SD1_DATA1__USDHC1_DATA1	0x40001382
++			MX93_PAD_SD1_DATA2__USDHC1_DATA2	0x40001382
++			MX93_PAD_SD1_DATA3__USDHC1_DATA3	0x40001382
++			MX93_PAD_SD1_DATA4__USDHC1_DATA4	0x40001382
++			MX93_PAD_SD1_DATA5__USDHC1_DATA5	0x40001382
++			MX93_PAD_SD1_DATA6__USDHC1_DATA6	0x40001382
++			MX93_PAD_SD1_DATA7__USDHC1_DATA7	0x40001382
++			MX93_PAD_SD1_STROBE__USDHC1_STROBE	0x1582
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc1_100mhz: usdhc1-100mhzgrp {
++		fsl,pins = <
++			MX93_PAD_SD1_CLK__USDHC1_CLK		0x158e
++			MX93_PAD_SD1_CMD__USDHC1_CMD		0x4000138e
++			MX93_PAD_SD1_DATA0__USDHC1_DATA0	0x4000138e
++			MX93_PAD_SD1_DATA1__USDHC1_DATA1	0x4000138e
++			MX93_PAD_SD1_DATA2__USDHC1_DATA2	0x4000138e
++			MX93_PAD_SD1_DATA3__USDHC1_DATA3	0x4000138e
++			MX93_PAD_SD1_DATA4__USDHC1_DATA4	0x4000138e
++			MX93_PAD_SD1_DATA5__USDHC1_DATA5	0x4000138e
++			MX93_PAD_SD1_DATA6__USDHC1_DATA6	0x4000138e
++			MX93_PAD_SD1_DATA7__USDHC1_DATA7	0x4000138e
++			MX93_PAD_SD1_STROBE__USDHC1_STROBE	0x158e
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc1_200mhz: usdhc1-200mhzgrp {
++		fsl,pins = <
++			MX93_PAD_SD1_CLK__USDHC1_CLK		0x15fe
++			MX93_PAD_SD1_CMD__USDHC1_CMD		0x400013fe
++			MX93_PAD_SD1_DATA0__USDHC1_DATA0	0x400013fe
++			MX93_PAD_SD1_DATA1__USDHC1_DATA1	0x400013fe
++			MX93_PAD_SD1_DATA2__USDHC1_DATA2	0x400013fe
++			MX93_PAD_SD1_DATA3__USDHC1_DATA3	0x400013fe
++			MX93_PAD_SD1_DATA4__USDHC1_DATA4	0x400013fe
++			MX93_PAD_SD1_DATA5__USDHC1_DATA5	0x400013fe
++			MX93_PAD_SD1_DATA6__USDHC1_DATA6	0x400013fe
++			MX93_PAD_SD1_DATA7__USDHC1_DATA7	0x400013fe
++			MX93_PAD_SD1_STROBE__USDHC1_STROBE	0x15fe
++		>;
++	};
++
++	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
++		fsl,pins = <
++			MX93_PAD_SD2_RESET_B__GPIO3_IO07	0x31e
++		>;
++	};
++
++	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
++		fsl,pins = <
++			MX93_PAD_SD2_CD_B__GPIO3_IO00		0x31e
++		>;
++	};
++
++	pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
++		fsl,pins = <
++			MX93_PAD_SD2_CD_B__GPIO3_IO00		0x51e
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc2: usdhc2grp {
++		fsl,pins = <
++			MX93_PAD_SD2_CLK__USDHC2_CLK		0x1582
++			MX93_PAD_SD2_CMD__USDHC2_CMD		0x40001382
++			MX93_PAD_SD2_DATA0__USDHC2_DATA0	0x40001382
++			MX93_PAD_SD2_DATA1__USDHC2_DATA1	0x40001382
++			MX93_PAD_SD2_DATA2__USDHC2_DATA2	0x40001382
++			MX93_PAD_SD2_DATA3__USDHC2_DATA3	0x40001382
++			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
++		fsl,pins = <
++			MX93_PAD_SD2_CLK__USDHC2_CLK		0x158e
++			MX93_PAD_SD2_CMD__USDHC2_CMD		0x4000138e
++			MX93_PAD_SD2_DATA0__USDHC2_DATA0	0x4000138e
++			MX93_PAD_SD2_DATA1__USDHC2_DATA1	0x4000138e
++			MX93_PAD_SD2_DATA2__USDHC2_DATA2	0x4000138e
++			MX93_PAD_SD2_DATA3__USDHC2_DATA3	0x4000138e
++			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
++		>;
++	};
++
++	/* need to config the SION for data and cmd pad, refer to ERR052021 */
++	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
++		fsl,pins = <
++			MX93_PAD_SD2_CLK__USDHC2_CLK		0x15fe
++			MX93_PAD_SD2_CMD__USDHC2_CMD		0x400013fe
++			MX93_PAD_SD2_DATA0__USDHC2_DATA0	0x400013fe
++			MX93_PAD_SD2_DATA1__USDHC2_DATA1	0x400013fe
++			MX93_PAD_SD2_DATA2__USDHC2_DATA2	0x400013fe
++			MX93_PAD_SD2_DATA3__USDHC2_DATA3	0x400013fe
++			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
++		>;
++	};
++};
+diff --git a/configs/imx9352_defconfig b/configs/imx9352_defconfig
+new file mode 100644
+index 00000000000..60279a90284
+--- /dev/null
++++ b/configs/imx9352_defconfig
+@@ -0,0 +1,193 @@
++CONFIG_ARM=y
++CONFIG_ARCH_IMX9=y
++CONFIG_TEXT_BASE=0x80200000
++CONFIG_SYS_MALLOC_LEN=0x2000000
++CONFIG_SYS_MALLOC_F_LEN=0x18000
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=2
++CONFIG_SF_DEFAULT_SPEED=40000000
++CONFIG_ENV_SIZE=0x4000
++CONFIG_ENV_OFFSET=0x700000
++CONFIG_DM_GPIO=y
++CONFIG_DEFAULT_DEVICE_TREE="imx9352"
++CONFIG_SPL_TEXT_BASE=0x2049A000
++# CONFIG_USB_TCPC is not set
++CONFIG_TARGET_IMX93_11X11_EVK=y
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_SYS_MONITOR_LEN=524288
++CONFIG_SPL_SERIAL=y
++CONFIG_SPL_DRIVERS_MISC=y
++CONFIG_SPL_STACK=0x20519dd0
++CONFIG_SPL=y
++CONFIG_CMD_DEKBLOB=y
++CONFIG_SPL_IMX_ROMAPI_LOADADDR=0x88000000
++CONFIG_SYS_LOAD_ADDR=0x80400000
++CONFIG_SYS_MEMTEST_START=0x80000000
++CONFIG_SYS_MEMTEST_END=0x90000000
++CONFIG_REMAKE_ELF=y
++CONFIG_FIT=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_DISTRO_DEFAULTS=y
++CONFIG_OF_SYSTEM_SETUP=y
++CONFIG_BOOTCOMMAND="run sr_ir_v2_cmd;run distro_bootcmd;run bsp_bootcmd"
++CONFIG_DEFAULT_FDT_FILE="imx9352.dtb"
++CONFIG_SYS_CBSIZE=2048
++CONFIG_SYS_PBSIZE=2074
++CONFIG_ARCH_MISC_INIT=y
++CONFIG_BOARD_EARLY_INIT_F=y
++CONFIG_BOARD_LATE_INIT=y
++CONFIG_SPL_MAX_SIZE=0x26000
++CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
++CONFIG_SPL_BSS_START_ADDR=0x2051a000
++CONFIG_SPL_BSS_MAX_SIZE=0x2000
++CONFIG_SPL_BOARD_INIT=y
++CONFIG_SPL_BOOTROM_SUPPORT=y
++CONFIG_SPL_LOAD_IMX_CONTAINER=y
++CONFIG_IMX_CONTAINER_CFG="arch/arm/mach-imx/imx9/container.cfg"
++# CONFIG_SPL_SHARES_INIT_SP_ADDR is not set
++CONFIG_SPL_SYS_MALLOC=y
++CONFIG_SPL_HAS_CUSTOM_MALLOC_START=y
++CONFIG_SPL_CUSTOM_SYS_MALLOC_ADDR=0x83200000
++CONFIG_SPL_SYS_MALLOC_SIZE=0x80000
++CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR=y
++CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x1040
++CONFIG_SPL_I2C=y
++CONFIG_SPL_POWER=y
++CONFIG_SPL_WATCHDOG=y
++CONFIG_SYS_PROMPT="u-boot=> "
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_NVEDIT_EFI=y
++CONFIG_CRC32_VERIFY=y
++CONFIG_CMD_MEMTEST=y
++CONFIG_CMD_CLK=y
++CONFIG_CMD_DFU=y
++CONFIG_CMD_FUSE=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_OPTEE_RPMB=y
++CONFIG_CMD_POWEROFF=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++CONFIG_CMD_SNTP=y
++CONFIG_CMD_BMP=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_CMD_RTC=y
++CONFIG_CMD_TIME=y
++CONFIG_CMD_GETTIME=y
++CONFIG_CMD_TIMER=y
++CONFIG_CMD_REGULATOR=y
++CONFIG_CMD_HASH=y
++CONFIG_CMD_EXT4_WRITE=y
++CONFIG_OF_CONTROL=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_NOWHERE=y
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_SYS_RELOC_GD_ENV_ADDR=y
++CONFIG_SYS_MMC_ENV_DEV=1
++CONFIG_USE_ETHPRIME=y
++CONFIG_ETHPRIME="eth1"
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_SPL_DM=y
++CONFIG_SYSCON=y
++CONFIG_ADC=y
++CONFIG_ADC_IMX93=y
++CONFIG_SPL_CLK_IMX93=y
++CONFIG_CLK_IMX93=y
++CONFIG_CPU=y
++CONFIG_CPU_IMX=y
++CONFIG_DFU_MMC=y
++CONFIG_DFU_RAM=y
++CONFIG_USB_FUNCTION_FASTBOOT=y
++CONFIG_UDP_FUNCTION_FASTBOOT=y
++CONFIG_FASTBOOT_BUF_ADDR=0x82800000
++CONFIG_FASTBOOT_BUF_SIZE=0x20000000
++CONFIG_FASTBOOT_FLASH=y
++CONFIG_FASTBOOT_UUU_SUPPORT=y
++CONFIG_IMX_RGPIO2P=y
++CONFIG_DM_PCA953X=y
++CONFIG_ADP5585_GPIO=y
++CONFIG_DM_I2C=y
++CONFIG_SYS_I2C_IMX_LPI2C=y
++CONFIG_SUPPORT_EMMC_RPMB=y
++CONFIG_SUPPORT_EMMC_BOOT=y
++CONFIG_MMC_IO_VOLTAGE=y
++CONFIG_MMC_UHS_SUPPORT=y
++CONFIG_MMC_HS400_ES_SUPPORT=y
++CONFIG_MMC_HS400_SUPPORT=y
++CONFIG_FSL_USDHC=y
++CONFIG_MTD=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_PHY_REALTEK=y
++CONFIG_DM_ETH_PHY=y
++CONFIG_PHY_GIGE=y
++CONFIG_DWC_ETH_QOS=y
++CONFIG_DWC_ETH_QOS_IMX=y
++CONFIG_FEC_MXC=y
++CONFIG_MII=y
++CONFIG_MIPI_DPHY_HELPERS=y
++CONFIG_PHY_IMX93_MIPI_DPHY=y
++CONFIG_PINCTRL=y
++CONFIG_SPL_PINCTRL=y
++CONFIG_PINCTRL_IMX93=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_IMX93_BLK_CTRL=y
++CONFIG_DM_PMIC=y
++CONFIG_DM_PMIC_PCA9450=y
++CONFIG_SPL_DM_PMIC_PCA9450=y
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_PCA9450=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_RTC=y
++CONFIG_RTC_PCF2131=y
++CONFIG_RTC_EMULATION=y
++CONFIG_DM_SERIAL=y
++CONFIG_FSL_LPUART=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_NXP_FSPI=y
++CONFIG_SYSRESET=y
++CONFIG_SYSRESET_CMD_POWEROFF=y
++CONFIG_SYSRESET_PSCI=y
++CONFIG_TEE=y
++CONFIG_OPTEE=y
++CONFIG_DM_THERMAL=y
++CONFIG_IMX_TMU=y
++CONFIG_USB=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_HOST_ETHER=y
++CONFIG_USB_ETHER_ASIX=y
++CONFIG_USB_ETHER_RTL8152=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_MANUFACTURER="FSL"
++CONFIG_USB_GADGET_VENDOR_NUM=0x1fc9
++CONFIG_USB_GADGET_PRODUCT_NUM=0x0152
++CONFIG_CI_UDC=y
++CONFIG_USB_PORT_AUTO=y
++CONFIG_SYS_WHITE_ON_BLACK=y
++CONFIG_SPLASH_SCREEN=y
++CONFIG_SPLASH_SCREEN_ALIGN=y
++CONFIG_BMP_16BPP=y
++CONFIG_BMP_24BPP=y
++CONFIG_BMP_32BPP=y
++CONFIG_ULP_WATCHDOG=y
++CONFIG_SPL_RSA=y
++CONFIG_SHA384=y
++CONFIG_LEGACY_IMAGE_FORMAT=y
++CONFIG_LZO=y
++CONFIG_BZIP2=y
++CONFIG_EFI_MM_COMM_TEE=y
++CONFIG_EFI_VAR_BUF_SIZE=139264
++CONFIG_EFI_SET_TIME=y
++CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
++CONFIG_EFI_CAPSULE_ON_DISK=y
++CONFIG_EFI_SECURE_BOOT=y
++CONFIG_EFI_IGNORE_OSINDICATIONS=y
++CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
++CONFIG_EFI_CAPSULE_AUTHENTICATE=y
++CONFIG_EFI_CAPSULE_ESL_FILE="CRT.esl"
