@@ -1,0 +1,21 @@
+diff --git a/binutils/readelf.c b/binutils/readelf.c
+index 5e4ad6ea..91cd46f7 100644
+--- a/binutils/readelf.c
++++ b/binutils/readelf.c
+@@ -371,15 +371,7 @@ enum versioned_symbol_info
+ static int
+ fseek64 (FILE *stream, int64_t offset, int whence)
+ {
+-#if defined (HAVE_FSEEKO64)
+-  off64_t o = offset;
+-  if (o != offset)
+-    {
+-      errno = EINVAL;
+-      return -1;
+-    }
+-  return fseeko64 (stream, o, whence);
+-#elif defined (HAVE_FSEEKO)
++#if defined (HAVE_FSEEKO)
+   off_t o = offset;
+   if (o != offset)
+     {
