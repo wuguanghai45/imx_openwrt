@@ -305,11 +305,6 @@
 		clocks = <&clk_audio>;
 		clock-names = "mclk";
 	};
-
-	lsm6dsm@6a {
-		compatible = "st,lsm6dso";
-		reg = <0x6a>;
-	};
 };
 
 &lpi2c2 {
@@ -427,13 +422,14 @@
                 compatible = "nxp,pcf8563";
                 reg = <0x51>;
                 status = "okay";
-        };
+	};
 
-        rx8010:rtc@32 {
-                compatible = "epson,rx8010";
-                reg = <0x32>;
-                status = "okay";
-        };
+	rx8010:rtc@32 {
+			compatible = "epson,rx8010";
+			reg = <0x32>;
+			status = "okay";
+	};
+
 	ov5645_0: ov5645_mipi@3c {
 		compatible = "ovti,ov5645";
 		reg = <0x3c>;
