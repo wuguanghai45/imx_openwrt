@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: (GPL-2.0+ OR MIT) */
 /*
- * Copyright 2022 NXP
- */
+* Copyright 2022 NXP
+*/
 
 #ifndef __DTS_IMX93_PINFUNC_H
 #define __DTS_IMX93_PINFUNC_H
