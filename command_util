@@ -1,0 +1,9 @@
+make menuconfig
+
+
+make kernel_menuconfig  -j 16
+
+
+make target/linux/compile  V=s -j 16
+
+make package/kernel/mac80211/compile V=s -j 16

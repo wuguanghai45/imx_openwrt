@@ -472,7 +472,7 @@
 
 
 &media_blk_ctrl {
-	status = "disabled";
+	status = "okay";
 };
 
 &mu1 {

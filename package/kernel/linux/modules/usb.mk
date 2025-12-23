@@ -1794,7 +1794,8 @@ define KernelPackage/usb3
 	+TARGET_mediatek:kmod-usb-xhci-mtk \
 	+TARGET_apm821xx_nand:kmod-usb-xhci-pci-renesas \
 	+TARGET_lantiq_xrx200:kmod-usb-xhci-pci-renesas \
-	+TARGET_mvebu_cortexa9:kmod-usb-xhci-pci-renesas
+	+TARGET_mvebu_cortexa9:kmod-usb-xhci-pci-renesas \
+	+TARGET_imx_cortexa55:kmod-usb-xhci-pci-renesas
   KCONFIG:= \
 	CONFIG_USB_PCI=y \
 	CONFIG_USB_XHCI_PCI \

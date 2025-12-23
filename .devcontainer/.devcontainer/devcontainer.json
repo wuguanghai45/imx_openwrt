@@ -1,0 +1,11 @@
+{
+    "name": "OpenWrt SDK Development Environment",
+    "dockerFile": "Dockerfile",
+    "context": "..",
+    "remoteUser": "root",
+    "workspaceFolder": "/root/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/root/workspace,type=bind",
+    "mounts": [
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+    ]
+}

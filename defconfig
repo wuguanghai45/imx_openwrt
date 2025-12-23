@@ -1,6 +1,6 @@
 CONFIG_TARGET_imx=y
-CONFIG_TARGET_imx_cortexa53=y
-CONFIG_TARGET_imx_cortexa53_DEVICE_imx8mmini=y
+CONFIG_TARGET_imx_cortexa55=y
+CONFIG_TARGET_imx_cortexa55_DEVICE_imx9352sd=y
 CONFIG_DEVEL=y
 CONFIG_KERNEL_GIT_CLONE_URI="https://github.com/nxp-imx/linux-imx.git"
 CONFIG_KERNEL_GIT_LOCAL_REPOSITORY=""

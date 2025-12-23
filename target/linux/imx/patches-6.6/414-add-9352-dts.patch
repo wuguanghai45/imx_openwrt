@@ -1107,7 +1107,7 @@ index 000000000..2d6561258
 +
 +
 +&media_blk_ctrl {
-+	status = "disabled";
++	status = "okay";
 +};
 +
 +&mu1 {
