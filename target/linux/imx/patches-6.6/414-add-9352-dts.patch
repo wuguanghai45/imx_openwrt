@@ -629,10 +629,10 @@ index 000000000..4298a145f
 +#endif /* __DTS_IMX93_PINFUNC_H */
 diff --git a/arch/arm64/boot/dts/freescale/imx9352.dts b/arch/arm64/boot/dts/freescale/imx9352.dts
 new file mode 100644
-index 000000000..c36bd504d
+index 000000000..1efa1a329
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/imx9352.dts
-@@ -0,0 +1,858 @@
+@@ -0,0 +1,704 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright 2022 NXP
@@ -913,12 +913,6 @@ index 000000000..c36bd504d
 +	status = "okay";
 +};
 +
-+
-+&lpm {
-+	soc-supply = <&buck1>;
-+	status = "okay";
-+};
-+
 +/*
 + * When add, delete or change any target device setting in &lpi2c1,
 + * please synchronize the changes to the &i3c1 bus in imx93-11x11-evk-i3c.dts.
@@ -940,11 +934,6 @@ index 000000000..c36bd504d
 +		clocks = <&clk_audio>;
 +		clock-names = "mclk";
 +	};
-+
-+	lsm6dsm@6a {
-+		compatible = "st,lsm6dso";
-+		reg = <0x6a>;
-+	};
 +};
 +
 +&lpi2c2 {
@@ -955,98 +944,6 @@ index 000000000..c36bd504d
 +	pinctrl-0 = <&pinctrl_lpi2c2>;
 +	pinctrl-1 = <&pinctrl_lpi2c2>;
 +	status = "okay";
-+
-+	pmic@25 {
-+		compatible = "nxp,pca9451a";
-+		reg = <0x25>;
-+/*		interrupt-parent = <&pcal6524>;
-+		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;*/
-+
-+		regulators {
-+			buck1: BUCK1 {
-+				regulator-name = "BUCK1";
-+				regulator-min-microvolt = <650000>;
-+				regulator-max-microvolt = <2237500>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+				regulator-ramp-delay = <3125>;
-+			};
-+
-+			buck2: BUCK2 {
-+				regulator-name = "BUCK2";
-+				regulator-min-microvolt = <600000>;
-+				regulator-max-microvolt = <2187500>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+				regulator-ramp-delay = <3125>;
-+			};
-+
-+			buck4: BUCK4{
-+				regulator-name = "BUCK4";
-+				regulator-min-microvolt = <600000>;
-+				regulator-max-microvolt = <3400000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			buck5: BUCK5{
-+				regulator-name = "BUCK5";
-+				regulator-min-microvolt = <600000>;
-+				regulator-max-microvolt = <3400000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			buck6: BUCK6 {
-+				regulator-name = "BUCK6";
-+				regulator-min-microvolt = <600000>;
-+				regulator-max-microvolt = <3400000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			ldo1: LDO1 {
-+				regulator-name = "LDO1";
-+				regulator-min-microvolt = <1600000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			ldo2: LDO2 {
-+				regulator-name = "LDO2";
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <1150000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			ldo3: LDO3 {
-+				regulator-name = "LDO3";
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			ldo4: LDO4 {
-+				regulator-name = "LDO4";
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			ldo5: LDO5 {
-+				regulator-name = "LDO5";
-+				regulator-min-microvolt = <1800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+		};
-+	};
-+
 +};
 +
 +&lpi2c3 {
@@ -1062,41 +959,6 @@ index 000000000..c36bd504d
 +                compatible = "nxp,pcf8563";
 +                reg = <0x51>;
 +                status = "okay";
-+	};
-+
-+	rx8010:rtc@32 {
-+			compatible = "epson,rx8010";
-+			reg = <0x32>;
-+			status = "okay";
-+	};
-+	
-+	ov5645_0: ov5645_mipi@3c {
-+		compatible = "ovti,ov5645";
-+		reg = <0x3c>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_csi0_gpio>;
-+		clocks = <&clk IMX93_CLK_CCM_CKO3>;
-+		clock-names = "xclk";
-+		assigned-clocks = <&clk IMX93_CLK_CCM_CKO3>;
-+		assigned-clock-parents = <&clk IMX93_CLK_24M>;
-+		assigned-clock-rates = <24000000>;
-+		csi_id = <0>;
-+		enable-gpios = <&gpio3 24 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&gpio3 25 GPIO_ACTIVE_LOW>;
-+		clock-frequency = <24000000>;
-+		mclk = <24000000>;
-+		mclk_source = <0>;
-+		mipi_csi;
-+		status = "okay";
-+
-+		port {
-+			ov5645_mipi_1_ep: endpoint {
-+				remote-endpoint = <&mipi_csi_ep>;
-+				data-lanes = <1 2>;
-+				clock-lanes = <0>;
-+				link-frequencies = /bits/ 64 <336000000>;
-+			};
-+		};
 +	};
 +};
 +
@@ -1474,29 +1336,13 @@ index 000000000..c36bd504d
 +		status = "okay";
 +	};
 +};
-+&mipi_csi {
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	status = "okay";
-+
-+	port@0 {
-+		reg = <0>;
-+		mipi_csi_ep: endpoint {
-+			remote-endpoint = <&ov5645_mipi_1_ep>;
-+			data-lanes = <2>;
-+			cfg-clk-range = <28>;
-+			hs-clk-range = <0x2b>;
-+			bus-type = <4>;
-+		};
-+	};
-+};
 +
 diff --git a/arch/arm64/boot/dts/freescale/imx9352.dtsi b/arch/arm64/boot/dts/freescale/imx9352.dtsi
 new file mode 100644
-index 000000000..9df140289
+index 000000000..d05045262
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/imx9352.dtsi
-@@ -0,0 +1,1639 @@
+@@ -0,0 +1,1644 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright 2022 NXP
@@ -1968,17 +1814,22 @@ index 000000000..9df140289
 +			};
 +
 +			tmu: tmu@44482000 {
-+				compatible = "fsl,imx93-tmu";
++				compatible ="fsl,imx93-tmu", "fsl,qoriq-tmu";
 +				reg = <0x44482000 0x1000>;
++				interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
 +				clocks = <&clk IMX93_CLK_TMC_GATE>;
 +				little-endian;
-+				fsl,tmu-calibration = <0x0000000e 0x800000da
-+						       0x00000029 0x800000e9
-+						       0x00000056 0x80000102
-+						       0x000000a2 0x8000012a
-+						       0x00000116 0x80000166
-+						       0x00000195 0x800001a7
-+						       0x000001b2 0x800001b6>;
++				fsl,tmu-range = <0x800000da 0x800000e9
++						 0x80000102 0x8000012a
++						 0x80000166 0x800001a7
++						 0x800001b6>;
++				fsl,tmu-calibration = <0x00000000 0x0000000e
++						       0x00000001 0x00000029
++						       0x00000002 0x00000056
++						       0x00000003 0x000000a2
++						       0x00000004 0x00000116
++						       0x00000005 0x00000195
++						       0x00000006 0x000001b2>;
 +				#thermal-sensor-cells = <1>;
 +			};
 +
