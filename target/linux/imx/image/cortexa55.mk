@@ -263,6 +263,10 @@ define Device/imx9352
   SOC_TYPE := iMX93
   BOOT_TYPE := flash_singleboot
   ENV_NAME:=imx9352-emmcboot
+  # Override rootfs partition size for 7GB eMMC to maximize space utilization
+  # Set to 0 to use all remaining space after kernel partition (recommended for maximum utilization)
+  # Alternatively, set to a fixed size like 6000MB if you prefer a specific partition size
+  IMX_SD_ROOTFS_PARTSIZE := 0
   DEVICE_PACKAGES += \
 	atf-imx9352 \
 	firmware-imx \
