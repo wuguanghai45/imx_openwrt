@@ -178,11 +178,22 @@ define U-Boot/imx93qsb
 endef
 
 
-define U-Boot/imx9352
+define U-Boot/imx9352sd
   BUILD_DEVICES:=imx93
   NAME:=imx9352 board
   UBOOT_CONFIG:=imx9352
   ENV_NAME:=imx9352-sdboot
+  DTB_NAME:=imx9352.dtb
+  ENV_SIZE:=0x4000
+  IMG_DIR:=iMX93
+  DEPENDS:=@TARGET_imx_cortexa55 +imx-mkimage
+endef
+
+define U-Boot/imx9352emmc
+  BUILD_DEVICES:=imx93
+  NAME:=imx9352 board
+  UBOOT_CONFIG:=imx9352
+  ENV_NAME:=imx9352-emmcboot
   DTB_NAME:=imx9352.dtb
   ENV_SIZE:=0x4000
   IMG_DIR:=iMX93
@@ -205,7 +216,8 @@ UBOOT_TARGETS := \
 	imx93evk \
 	imx93frdm \
 	imx93qsb \
-  imx9352 
+  imx9352sd \
+  imx9352emmc
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR_IMAGE)
