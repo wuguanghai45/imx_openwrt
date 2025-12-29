@@ -1,4 +1,4 @@
-FROM openwrt/sdk:latest
+FROM ubuntu:24.04
 
 USER root
 
@@ -8,21 +8,19 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        build-essential clang flex bison g++ gawk \
+        gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
+        python3-setuptools rsync swig unzip zlib1g-dev file wget \
         bash-completion \
         ca-certificates \
         curl \
-        git \
         less \
         lua5.1 \
         nano \
-        file \
-        python3-setuptools \
-        gawk \
         libgnutls28-dev \
         procps \
         shellcheck \
-        vim \
-        wget && \
+        vim && \
     rm -rf /var/lib/apt/lists/*
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
