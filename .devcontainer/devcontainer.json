@@ -5,9 +5,6 @@
     "remoteUser": "root",
     "workspaceFolder": "/root/workspace",
     "workspaceMount": "source=${localWorkspaceFolder},target=/root/workspace,type=bind",
-    "containerEnv": {
-        "FORCE_UNSAFE_CONFIGURE": "1"
-    },
     "mounts": [
         "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
     ],
