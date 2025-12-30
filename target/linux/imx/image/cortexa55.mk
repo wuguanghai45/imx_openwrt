@@ -183,16 +183,13 @@ define Device/imx93evk
 	firmware-sentinel \
 	imx-mkimage \
 	u-boot-imx93evk
-  DTS_DIR := ../dts
-  DEVICE_DTS := imx93-11x11-evk
-  IMAGES += boot.bin
-  IMAGE/boot.bin := \
-	imx-clean | \
-	imx-create-boot $$(BOARD_NAME)
+  DEVICE_DTS := $(basename $(notdir $(wildcard $(DTS_DIR)/freescale/imx93-*-evk*.dts)))
   IMAGE/sdcard.img := \
 	imx-clean | \
+	imx-create-flash $$(BOARD_NAME) $$(BOOT_TYPE) | \
 	boot-img-ext4 | \
 	sdcard-img-ext4 | \
+	imx-append-boot $$(SOC_TYPE) | \
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
 TARGET_DEVICES += imx93evk
@@ -214,15 +211,12 @@ define Device/imx93frdm
 	u-boot-imx93frdm
   DEVICE_DTS := $(basename $(notdir $(wildcard $(DTS_DIR)/freescale/imx93-11x11-frdm*.dts)))
   IMAGES += flash.bin
-  IMAGE/flash.bin := \
+  IMAGE/sdcard.img := \
 	imx-clean | \
 	imx-create-flash $$(BOARD_NAME) $$(BOOT_TYPE) | \
 	boot-img-ext4 | \
-	imx-append-env $$(ENV_NAME)-uboot-env.bin
-  IMAGE/sdcard.img := \
-	imx-clean | \
-	boot-img-ext4 | \
 	sdcard-img-ext4 | \
+	imx-append-boot $$(SOC_TYPE) | \
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
 TARGET_DEVICES += imx93frdm
@@ -281,6 +275,8 @@ define Device/imx9352
 	sdcard-img-ext4 | \
 	imx-append-env $$(ENV_NAME)-uboot-env.bin
 endef
+# u-boot-imx9352emmc
+
 TARGET_DEVICES += imx9352
 
 define Device/imx9352sd

@@ -12,10 +12,10 @@ index 737e959a6b5..7e16ba7f055 100644
  	imx93-14x14-evk.dtb \
 diff --git a/arch/arm/dts/imx9352-u-boot.dtsi b/arch/arm/dts/imx9352-u-boot.dtsi
 new file mode 100644
-index 00000000000..7243361f217
+index 00000000000..b09a58ef0bc
 --- /dev/null
 +++ b/arch/arm/dts/imx9352-u-boot.dtsi
-@@ -0,0 +1,184 @@
+@@ -0,0 +1,211 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright 2022 NXP
@@ -29,6 +29,25 @@ index 00000000000..7243361f217
 +		wdt = <&wdog3>;
 +		bootph-pre-ram;
 +		bootph-some-ram;
++	};
++
++	aliases {
++		usbgadget0 = &usbg1;
++		usbgadget1 = &usbg2;
++	};
++
++	usbg1: usbg1 {
++		compatible = "fsl,imx27-usb-gadget";
++		dr_mode = "peripheral";
++		chipidea,usb = <&usbotg1>;
++		status = "okay";
++	};
++
++	usbg2: usbg2 {
++		compatible = "fsl,imx27-usb-gadget";
++		dr_mode = "peripheral";
++		chipidea,usb = <&usbotg2>;
++		status = "okay";
 +	};
 +
 +	firmware {
@@ -144,6 +163,14 @@ index 00000000000..7243361f217
 +	bootph-pre-ram;
 +};
 +
++&{/soc@0/bus@44000000/i2c@44350000/pmic@25} {
++	bootph-pre-ram;
++};
++
++&{/soc@0/bus@44000000/i2c@44350000/pmic@25/regulators} {
++	bootph-pre-ram;
++};
++
 +&pinctrl_lpi2c1 {
 +	bootph-pre-ram;
 +};
@@ -202,10 +229,10 @@ index 00000000000..7243361f217
 +};
 diff --git a/arch/arm/dts/imx9352.dts b/arch/arm/dts/imx9352.dts
 new file mode 100644
-index 00000000000..884f1fbb82f
+index 00000000000..da4a2fdfdbc
 --- /dev/null
 +++ b/arch/arm/dts/imx9352.dts
-@@ -0,0 +1,502 @@
+@@ -0,0 +1,505 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright 2022 NXP
@@ -217,7 +244,7 @@ index 00000000000..884f1fbb82f
 +#include "imx93.dtsi"
 +
 +/ {
-+	model = "NXP i.MX9352 Wormhole board";
++	model = "NXP i.MX9352 Wormhole 3 board";
 +	compatible = "fsl,imx9352", "fsl,imx93-11x11-evk", "fsl,imx93";
 +
 +	aliases {
@@ -356,6 +383,9 @@ index 00000000000..884f1fbb82f
 +		compatible = "nxp,pca9451a";
 +		reg = <0x25>;
 +
++		interrupt-parent = <&gpio3>;
++		interrupts = <27 IRQ_TYPE_EDGE_FALLING>;
++		
 +		regulators {
 +			buck1: BUCK1 {
 +				regulator-name = "BUCK1";
@@ -708,12 +738,25 @@ index 00000000000..884f1fbb82f
 +		>;
 +	};
 +};
+diff --git a/board/ti/ks2_evm/ddr3_k2e.c b/board/ti/ks2_evm/ddr3_k2e.c
+index 95fe3a9021e..58d92b58991 100644
+--- a/board/ti/ks2_evm/ddr3_k2e.c
++++ b/board/ti/ks2_evm/ddr3_k2e.c
+@@ -41,7 +41,7 @@ u32 ddr3_init(void)
+ 	ddr3_init_ddrphy(KS2_DDR3A_DDRPHYC, &spd_cb.phy_cfg);
+ 	ddr3_init_ddremif(KS2_DDR3A_EMIF_CTRL_BASE, &spd_cb.emif_cfg);
+ 
+-	printf("DRAM: %d GiB\n", spd_cb.ddr_size_gbyte);
++	printf("DRAM: %d GiB 111\n", spd_cb.ddr_size_gbyte);
+ 
+ 	return (u32)spd_cb.ddr_size_gbyte;
+ }
 diff --git a/configs/imx9352_defconfig b/configs/imx9352_defconfig
 new file mode 100644
-index 00000000000..60279a90284
+index 00000000000..01efe5721fb
 --- /dev/null
 +++ b/configs/imx9352_defconfig
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,194 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_IMX9=y
 +CONFIG_TEXT_BASE=0x80200000
@@ -907,3 +950,18 @@ index 00000000000..60279a90284
 +CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
 +CONFIG_EFI_CAPSULE_AUTHENTICATE=y
 +CONFIG_EFI_CAPSULE_ESL_FILE="CRT.esl"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+\ No newline at end of file
+diff --git a/include/configs/imx93_evk.h b/include/configs/imx93_evk.h
+index 35977f3080c..c3da34d747c 100644
+--- a/include/configs/imx93_evk.h
++++ b/include/configs/imx93_evk.h
+@@ -165,7 +165,7 @@
+ 
+ #define CFG_SYS_SDRAM_BASE           0x80000000
+ #define PHYS_SDRAM                      0x80000000
+-#define PHYS_SDRAM_SIZE			0x80000000 /* 2GB DDR */
++#define PHYS_SDRAM_SIZE			0x40000000 /* 1GB DDR */
+ 
+ /* Using ULP WDOG for reset */
+ #define WDOG_BASE_ADDR          WDG3_BASE_ADDR
