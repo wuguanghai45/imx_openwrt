@@ -1,0 +1,130 @@
+diff --git a/core.c b/core.c
+index 6ff6781..956c001 100644
+--- a/core.c
++++ b/core.c
+@@ -6582,9 +6582,10 @@ int rtw89_core_register(struct rtw89_dev *rtwdev)
+ {
+ 	int ret;
+ 
++	rtw89_info(rtwdev, "registering core hw\n");
+ 	ret = rtw89_core_register_hw(rtwdev);
+ 	if (ret) {
+-		rtw89_err(rtwdev, "failed to register core hw\n");
++		rtw89_err(rtwdev, "failed to register core hw: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+diff --git a/core.h b/core.h
+index 2db1c2c..7f2a060 100644
+--- a/core.h
++++ b/core.h
+@@ -14,6 +14,11 @@
+ #include <linux/workqueue.h>
+ #include <net/mac80211.h>
+ 
++#ifdef __BACKPORT_H
++#undef LINUX_VERSION_CODE
++#define LINUX_VERSION_CODE KERNEL_VERSION(6, 11, 2)
++#endif
++
+ struct rtw89_dev;
+ struct rtw89_pci_info;
+ struct rtw89_usb_info;
+@@ -42,7 +47,6 @@ static inline void ieee80211_purge_tx_queue(struct ieee80211_hw *hw,
+ }
+ #endif
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 11, 0)
+ /**
+  * DIV_U64_ROUND_UP - unsigned 64bit divide with 32bit divisor rounded up
+  * @ll: unsigned 64bit dividend
+@@ -70,7 +74,6 @@ static inline u64 roundup_u64(u64 x, u32 y)
+ {
+ 	return DIV_U64_ROUND_UP(x, y) * y;
+ }
+-#endif
+ 
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 7, 0)
+  /* UL-bandwidth within common_info of trigger frame */
+diff --git a/usb.c b/usb.c
+index eb489df..2ffb35b 100644
+--- a/usb.c
++++ b/usb.c
+@@ -640,7 +640,7 @@ static int rtw89_usb_init_rx(struct rtw89_dev *rtwdev)
+ 	int i;
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
+-	rtwusb->rxwq = alloc_workqueue("rtw89_usb: rx wq", WQ_BH, 0);
++	rtwusb->rxwq = alloc_workqueue("rtw89_usb: rx wq", 0, 0);
+ #else
+ 	tasklet_init(&rtwusb->rx_tasklet, rtw89_usb_rx_handler,
+ 		     (unsigned long)rtwusb);
+@@ -959,6 +959,13 @@ static int rtw89_usb_parse(struct rtw89_dev *rtwdev,
+ 		return -EINVAL;
+ 	}
+ 
++	rtw89_info(rtwdev,
++		   "usb intf %u alt %u eps %d in %d out %d\n",
++		   intf_desc->bInterfaceNumber,
++		   intf_desc->bAlternateSetting,
++		   intf_desc->bNumEndpoints,
++		   num_in_pipes, num_out_pipes);
++
+ 	return 0;
+ }
+ 
+@@ -1112,8 +1119,17 @@ int rtw89_usb_probe(struct usb_interface *intf,
+ 		goto err_free_hw;
+ 	}
+ 
++	rtw89_info(rtwdev,
++		   "usb dev %04x:%04x speed %s if %u alt %u\n",
++		   le16_to_cpu(rtwusb->udev->descriptor.idVendor),
++		   le16_to_cpu(rtwusb->udev->descriptor.idProduct),
++		   usb_speed_string(rtwusb->udev->speed),
++		   intf->cur_altsetting->desc.bInterfaceNumber,
++		   intf->cur_altsetting->desc.bAlternateSetting);
++
+ 	ret = rtw89_usb_switch_mode(rtwdev);
+ 	if (ret) {
++		rtw89_info(rtwdev, "usb mode switched, waiting re-enumeration\n");
+ 		/* Not a fail, but we do need to skip rtw89_core_register. */
+ 		ret = 0;
+ 		goto err_intf_deinit;
+@@ -1127,12 +1143,16 @@ int rtw89_usb_probe(struct usb_interface *intf,
+ 	rtw89_usb_init_tx(rtwdev);
+ 
+ 	ret = rtw89_usb_alloc_rx_bufs(rtwusb);
+-	if (ret)
++	if (ret) {
++		rtw89_err(rtwdev, "failed to allocate rx bufs: %d\n", ret);
+ 		goto err_intf_deinit;
++	}
+ 
+ 	ret = rtw89_usb_init_rx(rtwdev);
+-	if (ret)
++	if (ret) {
++		rtw89_err(rtwdev, "failed to init rx: %d\n", ret);
+ 		goto err_free_rx_bufs;
++	}
+ 
+ 	ret = rtw89_core_init(rtwdev);
+ 	if (ret) {
+@@ -1142,13 +1162,15 @@ int rtw89_usb_probe(struct usb_interface *intf,
+ 
+ 	ret = rtw89_chip_info_setup(rtwdev);
+ 	if (ret) {
+-		rtw89_err(rtwdev, "failed to setup chip information\n");
++		rtw89_err(rtwdev,
++			   "failed to setup chip information: %d\n",
++			   ret);
+ 		goto err_core_deinit;
+ 	}
+ 
+ 	ret = rtw89_core_register(rtwdev);
+ 	if (ret) {
+-		rtw89_err(rtwdev, "failed to register core\n");
++		rtw89_err(rtwdev, "failed to register core: %d\n", ret);
+ 		goto err_core_deinit;
+ 	}
+ 

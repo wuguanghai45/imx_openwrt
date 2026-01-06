@@ -35,7 +35,7 @@ NOSTDINC_FLAGS := \
 define KernelPackage/rtw89-8852bu
   SUBMENU:=Wireless Drivers
   TITLE:=Realtek rtw89 USB RTL8852BU driver (backports)
-  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-mac80211 +kmod-cfg80211 +rtl8852be-firmware
+  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-mac80211 +kmod-cfg80211
   CONFLICTS:=kmod-rtw89 kmod-rtw89-pci kmod-rtw89-8851be kmod-rtw89-8852ae kmod-rtw89-8852be kmod-rtw89-8852ce
   FILES:= \
     $(PKG_BUILD_DIR)/rtw89_core_git.ko \
@@ -46,6 +46,7 @@ define KernelPackage/rtw89-8852bu
   AUTOLOAD:=$(call AutoLoad,50,rtw89_core_git rtw89_usb_git rtw89_8852b_common_git rtw89_8852b_git rtw89_8852bu_git)
 endef
 
+
 define KernelPackage/rtw89-8852bu/description
   rtw89 upstream USB driver for RTL8852BU built against OpenWrt backports
   mac80211/cfg80211. Only the USB 8852B variant is enabled.
@@ -53,6 +54,7 @@ endef
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
+	rm -rf $(PKG_BUILD_DIR)/.git $(PKG_BUILD_DIR)/.gitmodules
 endef
 
 define Build/Compile
@@ -65,6 +67,8 @@ endef
 define KernelPackage/rtw89-8852bu/install
 	$(INSTALL_DIR) $(1)/etc/modules.d
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/rtw89.conf $(1)/etc/modules.d/rtw89-usb
+	$(INSTALL_DIR) $(1)/lib/firmware/rtw89
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/firmware/rtw8852b_fw-1.bin $(1)/lib/firmware/rtw89/rtw8852b_fw-1.bin
 endef
 
 $(eval $(call KernelPackage,rtw89-8852bu))
