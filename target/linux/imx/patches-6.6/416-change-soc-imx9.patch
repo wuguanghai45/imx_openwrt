@@ -1,0 +1,37 @@
+diff --git a/drivers/soc/imx/soc-imx9.c b/drivers/soc/imx/soc-imx9.c
+index f255afa4a52d..36bedbfcd1a9 100644
+--- a/drivers/soc/imx/soc-imx9.c
++++ b/drivers/soc/imx/soc-imx9.c
+@@ -35,7 +35,7 @@ static int imx9_soc_device_register(struct device *dev)
+ 		goto attr;
+ 	}
+ 
+-	attr->family = kasprintf(GFP_KERNEL, "Freescale i.MX");
++	// attr->family = kasprintf(GFP_KERNEL, "Freescale i.MX");
+ 
+ 	/*
+ 	 * Retrieve the soc id, rev & uid info:
+@@ -45,10 +45,10 @@ static int imx9_soc_device_register(struct device *dev)
+ 	 * res.a3: uid[63:0];
+ 	 */
+ 	arm_smccc_smc(IMX_SIP_GET_SOC_INFO, 0, 0, 0, 0, 0, 0, 0, &res);
+-	if (res.a0 != SMCCC_RET_SUCCESS) {
+-		err = -EINVAL;
+-		goto family;
+-	}
++	// if (res.a0 != SMCCC_RET_SUCCESS) {
++	// 	err = -EINVAL;
++	// 	goto family;
++	// }
+ 
+ 	soc_id = SOC_ID(res.a1);
+ 	rev_major = SOC_REV_MAJOR(res.a1);
+@@ -76,8 +76,6 @@ static int imx9_soc_device_register(struct device *dev)
+ 	kfree(attr->soc_id);
+ 	kfree(attr->serial_number);
+ 	kfree(attr->revision);
+-family:
+-	kfree(attr->family);
+ attr:
+ 	kfree(attr);
+ 	return err;
