@@ -263,7 +263,7 @@ define Device/imx9352
 	firmware-sentinel \
 	imx-mkimage \
 	u-boot-imx9352emmc
-  DTS_DIR := ../dts
+  DEVICE_DTS_DIR := ../dts
   DEVICE_DTS := imx9352
   IMAGES += boot.bin
   IMAGE/boot.bin := \
@@ -294,7 +294,7 @@ define Device/imx9352sd
 	firmware-sentinel \
 	imx-mkimage \
 	u-boot-imx9352sd
-  DTS_DIR := ../dts
+  DEVICE_DTS_DIR := ../dts
   DEVICE_DTS := imx9352
   IMAGE/sdcard.img := \
 	imx-clean | \
