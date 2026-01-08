@@ -289,6 +289,9 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	pinctrl-1 = <&pinctrl_lpi2c1>;
+	assigned-clocks = <&clk IMX93_CLK_LPI2C1>;
+	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+	assigned-clock-rates = <60000000>;
 	status = "okay";
 
 	nau88c22_codec: nau8822@1a {
@@ -308,6 +311,9 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c2>;
 	pinctrl-1 = <&pinctrl_lpi2c2>;
+	assigned-clocks = <&clk IMX93_CLK_LPI2C2>;
+	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+	assigned-clock-rates = <60000000>;
 	status = "okay";
 };
 
@@ -318,6 +324,9 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c3>;
 	pinctrl-1 = <&pinctrl_lpi2c3>;
+	assigned-clocks = <&clk IMX93_CLK_LPI2C3>;
+	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+	assigned-clock-rates = <60000000>;
 	status = "okay";
 
 	pcf8563:rtc@51 {
